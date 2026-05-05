@@ -28,51 +28,91 @@ buttons.forEach((value) => {
   div.appendChild(btn);
 });
 
-function add(num1, num2) {
-  return num1 + num2;
+function add(firstNumber, secondNumber) {
+  return firstNumber + secondNumber;
 }
-function subtract(num1, num2) {
-  return num1 - num2;
+function subtract(firstNumber, secondNumber) {
+  return firstNumber - secondNumber;
 }
-function multiply(num1, num2) {
-  return num1 * num2;
-}
-
-function divide(num1, num2) {
-  return num1 / num2;
+function multiply(firstNumber, secondNumber) {
+  return firstNumber * secondNumber;
 }
 
-function operate(num1, num2, operator) {
+function divide(firstNumber, secondNumber) {
+  return firstNumber / secondNumber;
+}
+
+function operate(firstNumber, secondNumber, operator) {
   if (operator === "+") {
-    return add(num1, num2);
+    return add(firstNumber, secondNumber);
   } else if (operator === "-") {
-    return subtract(num1, num2);
+    return subtract(firstNumber, secondNumber);
   } else if (operator === "*") {
-    return multiply(num1, num2);
+    return multiply(firstNumber, secondNumber);
   } else if (operator === "/") {
-    return divide(num1, num2);
+    return divide(firstNumber, secondNumber);
   }
 }
+
+// Intialize variable
+let firstNumber = null;
+let operator = null;
+let resetDisplay = false;
+
+// main logic
 const disp = document.querySelector(".display");
 div.addEventListener("click", (e) => {
-  if (e.target.classList.contains("allbtn")) {
-    if (e.target.textContent === "ac") {
-      disp.textContent = "";
-    } else if (e.target.textContent === "c") {
-      disp.textContent = disp.textContent.slice(0, -1);
-    } else if (e.target.textContent === "=") {
-      let num1 = 0;
-      let num2 = 0;
-      let operator = "";
-      let result = "";
-      num1 = Number(disp.textContent.slice(0, 2));
-      operator = disp.textContent[2];
-      num2 = Number(disp.textContent.slice(3));
-      result = operate(num1, num2, operator);
+  if (!e.target.classList.contains("allbtn")) return;
+  const value = e.target.textContent;
 
-      disp.textContent = result;
+  // AC logic
+  if (value === "ac") {
+    disp.textContent = "";
+    firstNumber = null;
+    operator = null;
+    resetDisplay = false;
+    return;
+  }
+
+  // c logic
+  if (value === "c") {
+    disp.textContent = disp.textContent.slice(0, -1);
+    return;
+  }
+
+  // ["+","-","/","*"] logic
+  if (["+", "-", "/", "*"].includes(value)) {
+    const current = Number(disp.textContent);
+    if (firstNumber === null) {
+      firstNumber = current;
     } else {
-      disp.textContent += e.target.textContent;
+      firstNumber = operate(firstNumber, current, operator);
+      disp.textContent = firstNumber;
     }
+    operator = value;
+    resetDisplay = true;
+    return;
+  }
+
+  // "=" logic
+  if (value === "=") {
+    const current = Number(disp.textContent);
+
+    if (operator !== null) {
+      const result = operate(firstNumber, current, operator);
+      disp.textContent = result;
+
+      firstNumber = result;
+      operator = null;
+      shouldResetDisplay = true;
+    }
+    return;
+  }
+
+  if (resetDisplay) {
+    disp.textContent = value;
+    resetDisplay = false;
+  } else {
+    disp.textContent += value;
   }
 });
